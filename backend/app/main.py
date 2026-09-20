@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from app.core.config import settings
 from app.api.routes import auth
@@ -17,6 +19,10 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+
+# Mount static files for frontend
+frontend_path = Path(__file__).parent.parent.parent / "frontend"
+app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
 
 
 @app.on_event("startup")
