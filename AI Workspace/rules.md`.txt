@@ -1,0 +1,436 @@
+
+---
+
+# 2. `rules.md`
+
+```md
+# AI MULTILINGUAL VOICE & LANGUAGE PROCESSING PLATFORM
+# PROJECT RULES
+
+## 1. WHAT TO USE
+
+### Backend
+
+Use:
+
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy
+- PostgreSQL
+
+### AI
+
+Use:
+
+- OpenAI API
+- Existing OpenAI AI capabilities
+- Provider/service abstraction
+
+The OpenAI API key must only exist on the backend.
+
+### Frontend
+
+Use:
+
+- HTML
+- CSS
+- JavaScript
+
+Keep the frontend lightweight.
+
+### Authentication
+
+Use:
+
+- JWT authentication
+- Secure password hashing
+- Role-based authorization
+
+### Configuration
+
+Use:
+
+- .env
+- Environment variables
+- .env.example
+
+### Development
+
+Use:
+
+- Virtual environment
+- Git
+- GitHub
+- pytest
+
+### Architecture
+
+Use:
+
+- Service layer
+- API layer
+- Database models
+- Pydantic schemas
+- Provider abstraction
+
+Keep business logic outside route handlers.
+
+---
+
+## 2. WHAT TO AVOID
+
+Do NOT use:
+
+- AI model training
+- Fine-tuning
+- Local LLMs
+- Ollama
+- TensorFlow
+- PyTorch
+- GPU-based model processing
+- Large AI model downloads
+- Unnecessary AI frameworks
+- Unnecessary microservices
+- Duplicate services
+- Hard-coded language logic
+- Hard-coded API keys
+- Business logic inside frontend JavaScript
+- Business logic directly inside route handlers
+
+Do not add a technology only because it is popular.
+
+Every dependency must have a clear purpose.
+
+---
+
+## 3. LIBRARIES & DEPENDENCIES
+
+### Core
+
+#### fastapi
+
+Purpose:
+Backend API framework.
+
+#### uvicorn
+
+Purpose:
+Run the FastAPI application.
+
+#### openai
+
+Purpose:
+Communicate with OpenAI API.
+
+#### pydantic
+
+Purpose:
+Request/response validation.
+
+#### sqlalchemy
+
+Purpose:
+Database ORM.
+
+#### psycopg
+
+Purpose:
+PostgreSQL database connection.
+
+#### python-dotenv
+
+Purpose:
+Environment configuration during development.
+
+#### bcrypt / compatible password hashing library
+
+Purpose:
+Secure password hashing.
+
+#### python-jose or equivalent JWT library
+
+Purpose:
+JWT authentication.
+
+#### pytest
+
+Purpose:
+Automated testing.
+
+Only install dependencies that are actually required.
+
+Avoid unnecessary large packages.
+
+---
+
+## 4. ERROR HANDLING
+
+The application must handle:
+
+- Invalid audio
+- Unsupported audio format
+- Empty audio
+- Corrupted audio
+- File too large
+- Unsupported language
+- Unsupported language pair
+- OpenAI API errors
+- Rate limits
+- Timeouts
+- Network failures
+- Provider failures
+- Database errors
+- Authentication errors
+- Authorization errors
+- Invalid requests
+
+### User-facing errors
+
+Use simple messages.
+
+Example:
+
+"Sorry, we could not process your audio. Please try again."
+
+### Technical errors
+
+Log technical details securely.
+
+Never expose:
+
+- API keys
+- Stack traces
+- Database credentials
+- Internal system details
+
+---
+
+## 5. BOUNDARIES OF AI
+
+### AI CAN
+
+The AI can:
+
+- Transcribe speech
+- Translate text
+- Generate text
+- Answer general questions
+- Summarize text
+- Generate speech
+- Assist with language processing
+- Maintain conversation context where implemented
+
+### AI CANNOT GUARANTEE
+
+The system must not claim:
+
+- Perfect transcription
+- Perfect translation
+- Perfect language detection
+- Perfect pronunciation
+
+AI output may contain errors.
+
+Human review is therefore an important part of the platform.
+
+### Human Review Rule
+
+Never overwrite:
+
+AI-generated transcription
+
+with:
+
+Human-corrected transcription.
+
+Store both separately.
+
+### Medical / Legal / Financial Content
+
+If users ask about sensitive professional domains, the AI should provide general informational responses and should not present itself as a licensed professional.
+
+### AI Honesty
+
+The AI must not:
+
+- Claim an audio was processed when processing failed.
+- Claim a translation was generated when it was not.
+- Invent unsupported information.
+- Pretend to have accessed unavailable data.
+- Hide processing errors.
+
+---
+
+## 6. GENERAL RULES
+
+### 6.1 Code Style
+
+Follow:
+
+- PEP 8
+- Clear naming
+- Small functions
+- Single responsibility
+- Modular architecture
+- Type hints where practical
+
+### 6.2 Naming
+
+Python variables/functions:
+
+snake_case
+
+Classes:
+
+PascalCase
+
+Constants:
+
+UPPER_CASE
+
+API routes:
+
+REST-style naming.
+
+### 6.3 Commit Messages
+
+Use clear commit messages.
+
+Examples:
+
+feat: add audio upload
+feat: add speech to text service
+feat: add human transcription review
+fix: handle invalid audio format
+test: add transcription service tests
+docs: update architecture
+
+### 6.4 Security
+
+Never:
+
+- Hard-code API keys.
+- Commit .env.
+- Return API keys to frontend.
+- Trust uploaded filenames.
+- Allow unrestricted file uploads.
+- Expose private user records.
+
+Always:
+
+- Validate files.
+- Validate file size.
+- Validate authentication.
+- Validate authorization.
+- Protect private media.
+- Use environment variables.
+- Apply rate limiting where appropriate.
+
+### 6.5 Data Privacy
+
+Audio and transcription data may contain sensitive information.
+
+Therefore:
+
+- Store only necessary data.
+- Protect private files.
+- Restrict user access.
+- Do not expose one user's data to another.
+- Provide deletion mechanisms where appropriate.
+
+### 6.6 Performance
+
+Do not run large AI models locally.
+
+Use the OpenAI API.
+
+For long-running processing:
+
+- Use asynchronous/background processing where appropriate.
+- Do not keep HTTP requests open unnecessarily.
+- Track processing status.
+
+Avoid unnecessary API calls.
+
+### 6.7 Scalability
+
+Keep AI provider code separate from business logic.
+
+Use service/provider abstractions.
+
+Design database relationships carefully.
+
+Do not introduce microservices unless the application actually requires them.
+
+### 6.8 Documentation
+
+Document:
+
+- Installation
+- Environment variables
+- Architecture
+- API endpoints
+- Database design
+- AI workflow
+- Human review workflow
+- Supported languages
+- Testing
+- Deployment
+- Known limitations
+
+### 6.9 Testing
+
+Tests must cover:
+
+- Authentication
+- Authorization
+- Audio validation
+- Upload handling
+- Speech-to-text
+- Transcription storage
+- Human review
+- Comparison
+- Translation
+- Text-to-speech
+- Processing jobs
+- Error handling
+- API endpoints
+
+Automated tests should use mocked AI provider responses.
+
+Do not call paid AI APIs unnecessarily during every test.
+
+### 6.10 Project Development Rule
+
+Before changing the project:
+
+1. Inspect existing files.
+2. Understand the current architecture.
+3. Do not delete working code unnecessarily.
+4. Do not duplicate existing functionality.
+5. Make one logical change at a time.
+6. Test the change.
+7. Fix errors.
+8. Then continue to the next phase.
+
+Do not build the complete platform in one step.
+
+---
+
+## PROJECT BOUNDARIES
+
+The current project does NOT include:
+
+- Fine-tuning
+- Model training
+- Custom AI model
+- Local LLM
+- GPU AI processing
+- Ollama
+- TensorFlow
+- PyTorch
+
+The project uses existing AI capabilities through APIs.
+
+Future features such as RAG, advanced tool calling or additional providers may be added later.

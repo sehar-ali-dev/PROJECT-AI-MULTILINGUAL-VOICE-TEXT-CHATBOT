@@ -1,0 +1,596 @@
+# AI MULTILINGUAL VOICE & LANGUAGE PROCESSING PLATFORM
+# ARCHITECTURE
+
+## 1. ARCHITECTURE
+
+### 1.1 Project Vision
+
+Build an advanced, production-style multilingual AI voice and text language-processing platform using Python and OpenAI API capabilities.
+
+The platform allows users to:
+
+- Upload audio files.
+- Record voice through a microphone.
+- Convert speech into text.
+- Detect or manually select the source language.
+- Review and correct AI-generated transcription.
+- Compare AI-generated and human-corrected transcription.
+- Translate verified text into a target language.
+- Convert translated text into speech.
+- Play and download generated audio.
+- Maintain conversation and processing history.
+
+The project does NOT train an AI model and does NOT use fine-tuning.
+
+The system uses existing AI models through APIs.
+
+---
+
+### 1.2 Core AI Workflow
+
+Primary workflow:
+
+Audio Input
+    ↓
+Speech-to-Text
+    ↓
+AI-Generated Transcription
+    ↓
+Human Review
+    ↓
+Human-Corrected Transcription
+    ↓
+Translation
+    ↓
+Translated Text
+    ↓
+Text-to-Speech
+    ↓
+Generated Audio
+
+The system must keep these outputs separate:
+
+1. Original Audio
+2. AI-Generated Transcription
+3. Human-Corrected Transcription
+4. Machine Translation
+5. Generated Speech
+
+The original AI transcription must NEVER be overwritten by human corrections.
+
+---
+
+### 1.3 Alternative Workflows
+
+#### Text → Text
+
+User Text
+    ↓
+AI / Translation Service
+    ↓
+Translated Text
+
+#### Text → Audio
+
+Text
+    ↓
+Translation if required
+    ↓
+Text-to-Speech
+    ↓
+Audio
+
+#### Audio → Text
+
+Audio
+    ↓
+Speech-to-Text
+    ↓
+Transcription
+
+#### Audio → Translated Text
+
+Audio
+    ↓
+Speech-to-Text
+    ↓
+Transcription
+    ↓
+Translation
+    ↓
+Translated Text
+
+#### Audio → Translated Audio
+
+Audio
+    ↓
+Speech-to-Text
+    ↓
+Transcription
+    ↓
+Human Review
+    ↓
+Translation
+    ↓
+Text-to-Speech
+    ↓
+Translated Audio
+
+---
+
+### 1.4 Human-in-the-Loop Architecture
+
+Human review is a core feature.
+
+AI generates:
+
+    AI Transcription
+
+Human reviewer:
+
+    Reviews AI Transcription
+    ↓
+    Corrects errors
+    ↓
+    Submits verified transcription
+
+The system stores both:
+
+    AI Transcription
+    Human Corrected Transcription
+
+The application should never silently replace AI-generated data.
+
+---
+
+### 1.5 System Components
+
+#### Frontend
+
+Responsible for:
+
+- User interface
+- Audio upload
+- Microphone recording
+- Language selection
+- Chat interface
+- Transcription display
+- Human review editor
+- Translation display
+- Audio playback
+- Download controls
+- Processing status
+- Conversation history
+
+#### FastAPI Backend
+
+Responsible for:
+
+- API endpoints
+- Authentication
+- Authorization
+- Request validation
+- Business logic
+- AI service communication
+- Audio processing coordination
+- Database operations
+- Processing jobs
+- Error handling
+- Security
+
+#### AI Service Layer
+
+Separate services:
+
+- SpeechToTextService
+- TranslationService
+- TextToSpeechService
+- ChatService
+
+Provider-specific code must remain inside service modules.
+
+#### Database
+
+Stores:
+
+- Users
+- Conversations
+- Messages
+- Audio files metadata
+- Processing jobs
+- Transcriptions
+- Human reviews
+- Translations
+- Generated audio metadata
+- Languages
+- Review status
+
+#### Storage
+
+Audio files should be handled through a secure storage layer.
+
+Do not expose private audio files directly.
+
+---
+
+### 1.6 Provider Abstraction
+
+
+## AI Provider Strategy & Cost Management
+
+### 1. Development & Testing Mode (Mocked AI Provider - Default)
+To optimize local machine performance and avoid unnecessary API costs, the platform implements a **Provider Abstraction Layer** (`SpeechToTextProvider`, `TranslationProvider`, `TextToSpeechProvider`) [1].
+
+* **Configuration:** Set `USE_MOCK_AI=True` in `.env`.
+* **Cost:** **100% Free & Unlimited**.
+* **System Impact:** Instant responses with zero CPU/GPU overhead, keeping the local machine fast and lag-free during development and automated testing [2].
+* **Usage:** Used by default during coding, UI design, feature verification, and pytest runs [2].
+
+---
+
+### 2. Live Production Mode (OpenAI API - Paid)
+The platform integrates official OpenAI APIs for Speech-to-Text, Translation, and Text-to-Speech processing [3-5].
+
+* **Billing Note:** OpenAI API is a paid, usage-based service. Every real API call consumes OpenAI balance/credits.
+* **Configuration:** Set `USE_MOCK_AI=False` in `.env` and supply a valid `OPENAI_API_KEY`.
+* **Usage:** Enable only when performing real end-to-end testing with actual audio files and live AI generation.
+
+
+Do not tightly couple the entire application to one AI provider.
+
+Use interfaces/abstractions such as:
+
+- SpeechToTextProvider
+- TranslationProvider
+- TextToSpeechProvider
+
+Provider implementations should be replaceable.
+
+The core application should not need major changes if the AI provider/model changes.
+
+## AI Provider Strategy & Cost Management
+
+### 1. Development & Testing Mode (Mocked AI Provider - Default)
+To optimize local machine performance and avoid unnecessary API costs, the platform implements a **Provider Abstraction Layer** (`SpeechToTextProvider`, `TranslationProvider`, `TextToSpeechProvider`) [1].
+
+* **Configuration:** Set `USE_MOCK_AI=True` in `.env`.
+* **Cost:** **100% Free & Unlimited**.
+* **System Impact:** Instant responses with zero CPU/GPU overhead, keeping the local machine fast and lag-free during development and automated testing [2].
+* **Usage:** Used by default during coding, UI design, feature verification, and pytest runs [2].
+
+---
+
+### 2. Live Production Mode (OpenAI API - Paid)
+The platform integrates official OpenAI APIs for Speech-to-Text, Translation, and Text-to-Speech processing [3-5].
+
+* **Billing Note:** OpenAI API is a paid, usage-based service. Every real API call consumes OpenAI balance/credits.
+* **Configuration:** Set `USE_MOCK_AI=False` in `.env` and supply a valid `OPENAI_API_KEY`.
+* **Usage:** Enable only when performing real end-to-end testing with actual audio files and live AI generation.
+
+
+---
+
+### 1.7 Language Architecture
+
+The application must be language-agnostic.
+
+Do NOT hard-code the platform around only English, Urdu or Hindi.
+
+Create a language configuration system containing:
+
+- language code
+- language name
+- STT availability
+- translation availability
+- TTS availability
+
+Example supported languages may include:
+
+- English
+- Urdu
+- Hindi
+- Arabic
+- French
+- German
+- Spanish
+- Chinese
+- Japanese
+- Korean
+- Italian
+- Portuguese
+- Turkish
+- Russian
+
+The actual supported language list must depend on the configured AI providers/models.
+
+New languages should be addable without rewriting core application logic.
+
+---
+
+### 1.8 Processing Job Architecture
+
+Long-running audio processing should be handled asynchronously where appropriate.
+
+Workflow:
+
+Upload
+    ↓
+Create Processing Job
+    ↓
+Pending
+    ↓
+Processing
+    ↓
+Speech-to-Text
+    ↓
+Review Required
+    ↓
+Human Review
+    ↓
+Reviewed
+    ↓
+Translation
+    ↓
+Generating Audio
+    ↓
+Completed
+
+Possible statuses:
+
+- Pending
+- Processing
+- Review Required
+- Reviewed
+- Translating
+- Generating Audio
+- Completed
+- Failed
+
+The UI should display the current processing status.
+
+---
+
+### 1.9 User Roles
+
+#### USER
+
+Can:
+
+- Register/login
+- Upload audio
+- Record voice
+- Process audio
+- View transcription
+- Review their own transcription where allowed
+- Translate text
+- Generate audio
+- View their own history
+
+#### REVIEWER
+
+Can:
+
+- View assigned review tasks
+- Listen to original audio
+- Review AI transcription
+- Correct transcription
+- Add review notes
+- Submit reviewed transcription
+
+#### ADMIN
+
+Can:
+
+- Manage users
+- Manage reviewers
+- Manage languages
+- Monitor processing jobs
+- Monitor review status
+- View system statistics
+- Manage application configuration
+
+Authorization must be enforced on the backend.
+
+---
+
+### 1.10 API Architecture
+
+Design the backend as an API-first application so that a future mobile application can use the same backend.
+
+Example endpoints:
+
+POST /auth/register
+POST /auth/login
+POST /auth/logout
+
+POST /audio/upload
+POST /audio/record
+
+POST /speech/transcribe
+
+GET /transcriptions/{id}
+PATCH /transcriptions/{id}/review
+
+POST /translate
+
+POST /speech/synthesize
+
+POST /chat
+
+POST /conversations
+GET /conversations
+GET /conversations/{id}
+DELETE /conversations/{id}
+
+GET /processing-jobs/{id}
+
+GET /languages
+
+POST /admin/languages
+POST /admin/users
+
+Use proper HTTP methods, status codes and Pydantic validation.
+
+---
+
+## 2. FOLDER & FILE STRUCTURE
+
+```text
+ai-language-platform/
+│
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   │
+│   │   ├── core/
+│   │   │   ├── config.py
+│   │   │   ├── security.py
+│   │   │   └── logging.py
+│   │   │
+│   │   ├── api/
+│   │   │   ├── dependencies.py
+│   │   │   └── routes/
+│   │   │       ├── auth.py
+│   │   │       ├── audio.py
+│   │   │       ├── transcription.py
+│   │   │       ├── translation.py
+│   │   │       ├── speech.py
+│   │   │       ├── chat.py
+│   │   │       ├── conversations.py
+│   │   │       ├── processing.py
+│   │   │       └── admin.py
+│   │   │
+│   │   ├── models/
+│   │   │   ├── user.py
+│   │   │   ├── audio.py
+│   │   │   ├── transcription.py
+│   │   │   ├── review.py
+│   │   │   ├── translation.py
+│   │   │   ├── generated_audio.py
+│   │   │   ├── conversation.py
+│   │   │   ├── message.py
+│   │   │   ├── processing_job.py
+│   │   │   └── language.py
+│   │   │
+│   │   ├── schemas/
+│   │   │   ├── auth.py
+│   │   │   ├── audio.py
+│   │   │   ├── transcription.py
+│   │   │   ├── translation.py
+│   │   │   ├── speech.py
+│   │   │   ├── chat.py
+│   │   │   └── processing.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── openai/
+│   │   │   │   ├── client.py
+│   │   │   │   ├── speech_to_text.py
+│   │   │   │   ├── translation.py
+│   │   │   │   ├── text_to_speech.py
+│   │   │   │   └── chat.py
+│   │   │   │
+│   │   │   ├── audio_service.py
+│   │   │   ├── transcription_service.py
+│   │   │   ├── review_service.py
+│   │   │   ├── translation_service.py
+│   │   │   ├── speech_service.py
+│   │   │   └── processing_service.py
+│   │   │
+│   │   ├── providers/
+│   │   │   ├── speech_to_text.py
+│   │   │   ├── translation.py
+│   │   │   └── text_to_speech.py
+│   │   │
+│   │   ├── db/
+│   │   │   ├── database.py
+│   │   │   └── migrations/
+│   │   │
+│   │   └── workers/
+│   │       └── processing_worker.py
+│   │
+│   └── tests/
+│       ├── test_auth.py
+│       ├── test_audio.py
+│       ├── test_transcription.py
+│       ├── test_review.py
+│       ├── test_translation.py
+│       ├── test_speech.py
+│       └── test_authorization.py
+│
+├── frontend/
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── review.html
+│   ├── history.html
+│   │
+│   ├── css/
+│   │   └── style.css
+│   │
+│   └── js/
+│       ├── api.js
+│       ├── auth.js
+│       ├── chat.js
+│       ├── recorder.js
+│       ├── transcription.js
+│       ├── translation.js
+│       └── review.js
+│
+├── docs/
+│   ├── architecture.md
+│   ├── rules.md
+│   └── phases.md
+│
+├── .env
+├── .env.example
+├── .gitignore
+├── requirements.txt
+├── README.md
+└── docker-compose.yml
+
+
+3. TECH STACK
+Backend
+Python
+FastAPI
+Pydantic
+SQLAlchemy
+PostgreSQL
+OpenAI API
+Frontend
+HTML
+CSS
+JavaScript
+
+Keep the frontend lightweight.
+
+Do not introduce React unless there is a clear project requirement.
+
+Authentication
+JWT
+Secure password hashing
+AI
+OpenAI API
+Speech-to-Text
+Text generation/chat
+Translation through appropriate AI capabilities
+Text-to-Speech
+
+No local LLM.
+
+Testing
+pytest
+Mocked AI provider responses
+Development
+Python virtual environment
+Git
+GitHub
+VS Code
+Deployment
+Docker
+Production PostgreSQL
+HTTPS
+Environment variables
+
+The exact deployment provider can be selected later.but deploye nahi krna lkn jb depoloye k liye tiyar ho jie ga tw bta dena 

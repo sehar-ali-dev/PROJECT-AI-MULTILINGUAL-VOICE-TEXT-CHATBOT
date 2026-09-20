@@ -1,0 +1,641 @@
+# AI MULTILINGUAL VOICE & LANGUAGE PROCESSING PLATFORM
+# DEVELOPMENT PHASES
+
+## PHASE 1: PROJECT SETUP & ARCHITECTURE
+
+- Inspect existing project
+- Confirm Python environment
+- Create project structure
+- Configure FastAPI
+- Configure environment variables
+- Create .env.example
+- Configure database
+- Configure OpenAI API client
+- Create health-check endpoint
+- Create initial README
+
+Goal:
+
+The backend runs successfully and the architecture is ready.
+
+---
+
+## PHASE 2: LOGIN & AUTHENTICATION
+
+### User Authentication
+
+- User registration
+- Login
+- Logout
+- Password hashing
+- JWT authentication
+- Authentication middleware/dependencies
+- Protected routes
+
+### Authorization
+
+Create roles:
+
+- USER
+- REVIEWER
+- ADMIN
+
+Implement role-based access control.
+
+Goal:
+
+Users can securely access only authorized features and data.
+
+---
+
+## PHASE 3: DASHBOARD & BASIC UI
+
+Create the main dashboard.
+
+### Dashboard sections
+
+- Upload Audio
+- Record Voice
+- Source Language
+- Auto Detect
+- Target Language
+- Process Audio
+- Recent Processing Jobs
+- Conversation History
+- Processing Status
+
+Use a clear step-based interface:
+
+STEP 1 — INPUT
+STEP 2 — AI TRANSCRIPTION
+STEP 3 — HUMAN REVIEW
+STEP 4 — TRANSLATION
+STEP 5 — TEXT-TO-SPEECH
+STEP 6 — FINAL RESULT
+
+Goal:
+
+Create the complete basic user interface before advanced processing.
+
+---
+
+## PHASE 4: AUDIO UPLOAD & MICROPHONE
+
+### Audio Upload
+
+Implement:
+
+- File upload
+- File type validation
+- File size validation
+- Duration validation where required
+- Corrupted file detection
+- Secure filename handling
+
+### Microphone Recording
+
+Implement:
+
+- Start
+- Pause
+- Resume
+- Stop
+- Preview
+- Delete
+- Submit
+
+Goal:
+
+Users can provide audio either by upload or direct recording.
+
+---
+
+## PHASE 5: SPEECH-TO-TEXT
+
+Create a dedicated Speech-to-Text service.
+
+Workflow:
+
+Audio
+↓
+STT Provider
+↓
+AI Transcription
+↓
+Database
+
+Store:
+
+- Audio ID
+- Source language
+- AI transcription
+- Timestamp
+- Processing status
+- Provider/model metadata where appropriate
+
+Preserve timestamps/segments/confidence information if supported by the provider.
+
+Goal:
+
+Convert real audio into AI-generated transcription.
+
+---
+
+## PHASE 6: AI TRANSCRIPTION DISPLAY
+
+Create the transcription interface.
+
+Show:
+
+- Original audio
+- AI-generated transcription
+- Source language
+- Processing status
+- Error state
+
+Goal:
+
+Users/reviewers can clearly inspect the AI output.
+
+---
+
+## PHASE 7: HUMAN REVIEW & CORRECTION
+
+Create Human Review module.
+
+Reviewer should be able to:
+
+- Listen to original audio
+- Edit transcription
+- Correct spelling
+- Correct missing words
+- Correct punctuation
+- Mark unclear sections
+- Add notes
+- Submit review
+
+Store separately:
+
+AI Transcription
+
+Human Corrected Transcription
+
+Reviewer
+
+Review Timestamp
+
+Review Status
+
+Goal:
+
+Create a real Human-in-the-Loop AI workflow.
+
+---
+
+## PHASE 8: AI VS HUMAN COMPARISON
+
+Create a comparison interface.
+
+Example:
+
+AI:
+"Mujhe kal doctor ke pas jana he."
+
+Human:
+"Mujhe kal doctor ke paas jaana hai."
+
+Show:
+
+- Changed words
+- Added words
+- Removed words
+- Number of edits
+- Review status
+
+Do not claim that edit statistics are professional linguistic accuracy measurements unless a validated methodology is implemented.
+
+Goal:
+
+Demonstrate how humans improve AI-generated language data.
+
+---
+
+## PHASE 9: MULTILINGUAL TRANSLATION
+
+Create a dedicated Translation Service.
+
+Workflow:
+
+Human Corrected Transcription
+↓
+Translation Provider
+↓
+Target Language
+↓
+Translated Text
+
+Features:
+
+- Source language selection
+- Auto-detection where supported
+- Target language selection
+- Language capability validation
+- Context-aware translation
+- Translation error handling
+
+Goal:
+
+Translate verified transcription into supported target languages.
+
+---
+
+## PHASE 10: TEXT-TO-SPEECH
+
+Create dedicated Text-to-Speech service.
+
+Workflow:
+
+Translated Text
+↓
+TTS Provider
+↓
+Generated Audio
+
+Features:
+
+- Target language
+- Supported voice selection
+- Play
+- Pause
+- Replay
+- Download
+
+Goal:
+
+Convert translated language into usable speech audio.
+
+---
+
+## PHASE 11: COMPLETE AUDIO TRANSLATION WORKFLOW
+
+Combine the previous phases.
+
+Complete flow:
+
+Voice Input
+↓
+Speech-to-Text
+↓
+AI Transcription
+↓
+Human Review
+↓
+Corrected Transcription
+↓
+Translation
+↓
+Translated Text
+↓
+Text-to-Speech
+↓
+Translated Audio
+
+Goal:
+
+Complete end-to-end multilingual voice translation.
+
+---
+
+## PHASE 12: TEXT CHAT & VOICE ASSISTANT
+
+Add normal AI chatbot capabilities.
+
+### Text Mode
+
+User:
+
+Text
+↓
+OpenAI
+↓
+AI Response
+
+### Voice Mode
+
+User Voice
+↓
+Speech-to-Text
+↓
+AI
+↓
+Text Response
+↓
+Text-to-Speech
+↓
+Voice Response
+
+Features:
+
+- General questions
+- Educational questions
+- Explanations
+- Summaries
+- Writing assistance
+- Translation requests
+- Conversation context
+- Streaming responses where appropriate
+
+Goal:
+
+Transform the language-processing platform into a complete multilingual AI assistant.
+
+---
+
+## PHASE 13: CONVERSATION & PROCESSING HISTORY
+
+Store:
+
+- User
+- Conversation
+- Messages
+- Source language
+- Target language
+- Message type
+- Audio metadata
+- Transcription
+- Human correction
+- Translation
+- Generated audio
+- Processing status
+- Timestamp
+
+Users should only access their own private records.
+
+Goal:
+
+Users can return to previous conversations and processing jobs.
+
+---
+
+## PHASE 14: ASYNC PROCESSING & JOB MANAGEMENT
+
+For long audio or multi-step processing:
+
+Create Processing Jobs.
+
+Statuses:
+
+- Pending
+- Processing
+- Review Required
+- Reviewed
+- Translating
+- Generating Audio
+- Completed
+- Failed
+
+Implement background/asynchronous processing where appropriate.
+
+Goal:
+
+The interface should remain responsive during long AI operations.
+
+---
+
+## PHASE 15: REVIEWER & ADMIN SYSTEM
+
+### Reviewer
+
+- View assigned tasks
+- Review transcription
+- Correct transcription
+- Add notes
+- Submit review
+
+### Admin
+
+- Manage users
+- Manage reviewers
+- Manage languages
+- Monitor jobs
+- Monitor review status
+- View statistics
+- Manage configuration
+
+Goal:
+
+Create a realistic multi-role platform.
+
+---
+
+## PHASE 16: API DEVELOPMENT
+
+Create and document API endpoints for:
+
+- Authentication
+- Audio upload
+- Recording submission
+- Speech-to-text
+- Transcription review
+- Translation
+- Text-to-speech
+- Chat
+- Conversations
+- Processing jobs
+- History
+- User profile
+- Languages
+- Administration
+
+Goal:
+
+Make the backend reusable by a future mobile application.
+
+---
+
+## PHASE 17: SECURITY HARDENING
+
+Implement:
+
+- Secure authentication
+- Authorization
+- File validation
+- File-size limits
+- Private media access
+- API-key protection
+- Rate limiting
+- Input validation
+- Secure logging
+- Protection against unauthorized data access
+
+Goal:
+
+Prepare the application for production use.
+
+---
+
+## PHASE 18: TESTING & QUALITY ASSURANCE
+
+### Unit Tests
+
+Test:
+
+- Authentication
+- Audio validation
+- STT service
+- Translation service
+- TTS service
+- Review service
+- Processing service
+
+### Integration Tests
+
+Test:
+
+- API endpoints
+- Database operations
+- Authentication flow
+- Authorization
+- Processing workflow
+
+### AI Testing
+
+Use mocked AI provider responses.
+
+Do not depend on paid API calls for every automated test.
+
+### Quality Assurance
+
+- Bug fixing
+- Error handling
+- Performance testing
+- Security testing
+- User workflow testing
+
+Goal:
+
+Verify the complete application.
+
+---
+
+## PHASE 19: DOCUMENTATION
+
+Create complete documentation for:
+
+- Project purpose
+- Architecture
+- Folder structure
+- Technology stack
+- AI workflow
+- Human review workflow
+- Translation workflow
+- TTS workflow
+- Database
+- API
+- Environment variables
+- Supported languages
+- Installation
+- Testing
+- Deployment
+- Known limitations
+
+Goal:
+
+Make the project understandable to another developer.
+
+---
+
+## PHASE 20: DEPLOYMENT & MAINTENANCE
+
+Prepare:
+
+- Production environment
+- Production database
+- Environment variables
+- Docker configuration
+- HTTPS
+- Backend deployment
+- Frontend deployment
+- Database migrations
+- Logging
+- Monitoring
+
+After deployment:
+
+- Monitor errors
+- Monitor API usage
+- Monitor processing failures
+- Fix bugs
+- Improve performance
+- Collect user feedback
+
+Goal:
+
+Deploy the application as a real production-style portfolio project.
+
+---
+
+# OPTIONAL FUTURE FEATURES
+
+These are NOT required for the first complete version.
+
+Possible future additions:
+
+- RAG / Knowledge Base
+- PDF processing
+- Multiple AI providers
+- Advanced tool/function calling
+- Advanced analytics
+- Mobile application
+- Team workspaces
+- Enterprise organization accounts
+- Advanced annotation tools
+- More sophisticated language evaluation
+
+Do not add these until the core platform is stable.
+
+---
+
+# FINAL PROJECT OBJECTIVE
+
+The finished platform should demonstrate practical knowledge of:
+
+- Python
+- FastAPI
+- REST API
+- OpenAI API
+- Speech-to-Text
+- Natural Language Processing
+- Multilingual Translation
+- Text-to-Speech
+- Audio Processing
+- Human-in-the-Loop AI
+- Data Annotation
+- Database Design
+- Authentication
+- Authorization
+- Async Processing
+- Testing
+- Security
+- Software Architecture
+- Deployment
+
+The final product should be a serious portfolio project rather than a simple chatbot tutorial.
+
+IMPORTANT:
+
+Start by inspecting the existing project.
+
+Before coding, confirm:
+
+1. Architecture
+2. Folder structure
+3. Technology stack
+4. Database/entity plan
+5. AI service architecture
+6. Dependencies
+7. Development phases
+
+Do NOT start implementing all features at once.
+
+Build and test one phase at a time.
