@@ -8,8 +8,8 @@ from app.db.database import Base, get_db
 from app.models.user import User, UserRole
 from app.core.security import get_password_hash
 
-# Test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# Test database - use file-based for proper isolation
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test_auth.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

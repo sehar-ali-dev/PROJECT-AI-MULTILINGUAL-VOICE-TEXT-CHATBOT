@@ -8,11 +8,19 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
 async function fetchAPI(endpoint, options = {}) {
     const token = localStorage.getItem('access_token');
     
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
+    // Only set Content-Type for non-FormData requests
+    // FormData requires browser to set multipart/form-data with boundary
+    const headers = {};
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
     
+    // Add any custom headers
+    if (options.headers) {
+        Object.assign(headers, options.headers);
+    }
+    
+    // Add Authorization header if token exists
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -32,8 +40,15 @@ async function fetchAPI(endpoint, options = {}) {
         }
         
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'API request failed');
+            let errorMessage = 'API request failed';
+            try {
+                const error = await response.json();
+                errorMessage = error.detail || error.message || errorMessage;
+            } catch (e) {
+                // If response is not JSON, use status text
+                errorMessage = response.statusText || errorMessage;
+            }
+            throw new Error(errorMessage);
         }
         
         return await response.json();

@@ -6,8 +6,9 @@ from pathlib import Path
 from app.core.config import settings
 from app.api.routes import auth
 from app.api.routes import audio as audio_routes
+from app.api.routes import transcription as transcription_routes
 from app.db.database import engine, Base
-from app.models import user, audio
+from app.models import user, audio, transcription
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -21,6 +22,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(audio_routes.router, prefix="/api/v1/audio", tags=["audio"])
+app.include_router(transcription_routes.router, prefix="/api/v1/speech", tags=["speech"])
 
 
 @app.on_event("startup")

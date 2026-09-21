@@ -221,7 +221,6 @@ async function submitRecording() {
         const response = await fetchAPI('/audio/record', {
             method: 'POST',
             body: formData,
-            headers: {}, // Let browser set Content-Type for FormData
         });
         
         if (response) {
@@ -232,11 +231,15 @@ async function submitRecording() {
             stopRecordBtn.style.display = 'none';
             
             // Store audio file ID for next step
-            localStorage.setItem('current_audio_id', response.id);
+            const audioId = response.id || response.audio_id;
+            localStorage.setItem('current_audio_id', audioId);
             localStorage.setItem('current_audio_source', 'record');
             
             // Enable process button
             processBtn.disabled = false;
+            
+            // Automatically trigger transcription
+            await triggerTranscription(audioId);
         }
     } catch (error) {
         alert('Failed to save recording: ' + error.message);
@@ -289,7 +292,6 @@ async function uploadFile(file) {
         const response = await fetchAPI('/audio/upload', {
             method: 'POST',
             body: formData,
-            headers: {}, // Let browser set Content-Type for FormData
         });
         
         if (response) {
@@ -297,11 +299,15 @@ async function uploadFile(file) {
             fileDropzone.innerHTML = `<p>✅ ${file.name} uploaded</p>`;
             
             // Store audio file ID for next step
-            localStorage.setItem('current_audio_id', response.id);
+            const audioId = response.id || response.audio_id;
+            localStorage.setItem('current_audio_id', audioId);
             localStorage.setItem('current_audio_source', 'upload');
             
             // Enable process button
             processBtn.disabled = false;
+            
+            // Automatically trigger transcription
+            await triggerTranscription(audioId);
         }
     } catch (error) {
         alert('Failed to upload file: ' + error.message);
@@ -321,4 +327,93 @@ recorder.startRecording = async function() {
 // Initialize process button as disabled
 if (processBtn) {
     processBtn.disabled = true;
+}
+
+// Trigger transcription after successful upload/record
+async function triggerTranscription(audioId) {
+    const sourceLanguage = document.getElementById('sourceLanguage')?.value;
+    
+    try {
+        // Disable process button and show loading
+        if (processBtn) {
+            processBtn.disabled = true;
+            processBtn.textContent = 'Processing...';
+        }
+        
+        // Call transcription API
+        const body = {
+            audio_id: parseInt(audioId)
+        };
+        if (sourceLanguage && sourceLanguage !== 'auto') {
+            body.source_language = sourceLanguage;
+        }
+        
+        const transcription = await fetchAPI('/speech/transcribe', {
+            method: 'POST',
+            body: JSON.stringify(body),
+        });
+        
+        // Store transcription data
+        localStorage.setItem('current_transcription_id', transcription.id);
+        localStorage.setItem('current_transcription_text', transcription.ai_transcription);
+        localStorage.setItem('detected_language', transcription.source_language);
+        
+        // Update STEP 2 UI
+        updateStep2UI(transcription);
+        
+        // Move to STEP 2
+        moveToStep(2);
+        
+        alert('Transcription completed successfully!');
+    } catch (error) {
+        alert('Transcription failed: ' + error.message);
+    } finally {
+        if (processBtn) {
+            processBtn.disabled = false;
+            processBtn.textContent = 'Start Processing';
+        }
+    }
+}
+
+// Update STEP 2 UI with transcription results
+function updateStep2UI(transcription) {
+    const transcriptionText = document.getElementById('transcriptionText');
+    const transcriptionLanguage = document.getElementById('transcriptionLanguage');
+    const transcriptionConfidence = document.getElementById('transcriptionConfidence');
+    
+    if (transcriptionText) {
+        transcriptionText.innerHTML = `<p>${transcription.ai_transcription}</p>`;
+    }
+    
+    if (transcriptionLanguage) {
+        transcriptionLanguage.textContent = `Language: ${transcription.source_language || 'Unknown'}`;
+    }
+    
+    if (transcriptionConfidence) {
+        const confidence = transcription.confidence_score 
+            ? `${(transcription.confidence_score * 100).toFixed(1)}%` 
+            : 'N/A';
+        transcriptionConfidence.textContent = `Confidence: ${confidence}`;
+    }
+}
+
+// Move to specific step
+function moveToStep(stepNumber) {
+    // Update step indicators
+    document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+        if (parseInt(step.dataset.step) === stepNumber) {
+            step.classList.add('active');
+        }
+    });
+    
+    // Update step content
+    document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    const targetStep = document.getElementById(`step${stepNumber}`);
+    if (targetStep) {
+        targetStep.classList.add('active');
+    }
 }
