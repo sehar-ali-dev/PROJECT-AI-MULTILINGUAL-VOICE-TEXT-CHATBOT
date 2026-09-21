@@ -5,8 +5,9 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.api.routes import auth
+from app.api.routes import audio as audio_routes
 from app.db.database import engine, Base
-from app.models import user
+from app.models import user, audio
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -19,10 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-
-# Mount static files for frontend
-frontend_path = Path(__file__).parent.parent.parent / "frontend"
-app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
+app.include_router(audio_routes.router, prefix="/api/v1/audio", tags=["audio"])
 
 
 @app.on_event("startup")
@@ -37,3 +35,8 @@ async def health_check():
         "status": "ok",
         "mock_ai": settings.USE_MOCK_AI
     }
+
+
+# Mount static files for frontend (must be after API routes)
+frontend_path = Path(__file__).parent.parent.parent / "frontend"
+app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")

@@ -134,6 +134,24 @@ body {
     background-color: #5a6268;
 }
 
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
 .btn-full {
     width: 100%;
 }
@@ -498,6 +516,22 @@ body {
     color: #999;
     font-size: 14px;
     font-style: italic;
+}
+
+/* Recording Preview */
+.recording-preview {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.recording-preview audio {
+    width: 100%;
+}
+
+.recording-preview button {
+    margin-top: 10px;
 }
 
 /* Responsive */
