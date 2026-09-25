@@ -126,7 +126,7 @@ def test_transcribe_audio_invalid_id(client, auth_token):
 
 
 def test_get_transcription(client, auth_token, audio_id):
-    """Test getting a specific transcription."""
+    """Test getting a specific transcription with audio metadata."""
     # First create a transcription
     transcribe_response = client.post(
         "/api/v1/speech/transcribe",
@@ -145,12 +145,32 @@ def test_get_transcription(client, auth_token, audio_id):
     data = response.json()
     assert data["id"] == transcription_id
     assert data["audio_id"] == audio_id
+    assert data["ai_transcription"] is not None
+    
+    # Verify audio metadata is included
+    assert "audio_metadata" in data
+    assert data["audio_metadata"] is not None
+    assert data["audio_metadata"]["id"] == audio_id
+    assert data["audio_metadata"]["original_filename"] == "test_audio.mp3"
+    assert data["audio_metadata"]["file_type"] == ".mp3"
+    assert data["audio_metadata"]["file_size_bytes"] > 0
+    assert data["audio_metadata"]["source_type"] in ["upload", "record"]
 
 
 def test_get_transcription_without_auth(client):
     """Test getting transcription without authentication."""
     response = client.get("/api/v1/speech/transcriptions/1")
     assert response.status_code == 401
+
+
+def test_get_transcription_not_found(client, auth_token):
+    """Test getting a non-existent transcription returns 404."""
+    response = client.get(
+        "/api/v1/speech/transcriptions/99999",
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"]
 
 
 def test_list_transcriptions(client, auth_token, audio_id):

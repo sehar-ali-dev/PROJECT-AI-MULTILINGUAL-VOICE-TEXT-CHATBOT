@@ -380,20 +380,80 @@ function updateStep2UI(transcription) {
     const transcriptionText = document.getElementById('transcriptionText');
     const transcriptionLanguage = document.getElementById('transcriptionLanguage');
     const transcriptionConfidence = document.getElementById('transcriptionConfidence');
+    const transcriptionDuration = document.getElementById('transcriptionDuration');
+    const transcriptionStatus = document.getElementById('transcriptionStatus');
+    const transcriptionFilename = document.getElementById('transcriptionFilename');
+    const transcriptionFileSize = document.getElementById('transcriptionFileSize');
+    const audioPlayer = document.getElementById('transcriptionAudioPlayer');
+    const errorBanner = document.getElementById('transcriptionError');
+    const errorMessage = document.getElementById('errorMessage');
     
+    // Hide error banner
+    if (errorBanner) {
+        errorBanner.style.display = 'none';
+    }
+    
+    // Check for failed status
+    if (transcription.status === 'FAILED') {
+        if (errorBanner && errorMessage) {
+            errorMessage.textContent = 'Unable to transcribe audio. Please try again.';
+            errorBanner.style.display = 'flex';
+        }
+        return;
+    }
+    
+    // Update transcription text
     if (transcriptionText) {
-        transcriptionText.innerHTML = `<p>${transcription.ai_transcription}</p>`;
+        transcriptionText.innerHTML = `<p>${transcription.ai_transcription || 'No transcription available'}</p>`;
     }
     
+    // Update language badge
     if (transcriptionLanguage) {
-        transcriptionLanguage.textContent = `Language: ${transcription.source_language || 'Unknown'}`;
+        const lang = transcription.source_language || 'Unknown';
+        transcriptionLanguage.textContent = `Language: ${lang.toUpperCase()}`;
     }
     
+    // Update confidence badge
     if (transcriptionConfidence) {
         const confidence = transcription.confidence_score 
             ? `${(transcription.confidence_score * 100).toFixed(1)}%` 
             : 'N/A';
         transcriptionConfidence.textContent = `Confidence: ${confidence}`;
+    }
+    
+    // Update duration badge
+    if (transcriptionDuration && transcription.audio_metadata) {
+        const duration = transcription.audio_metadata.duration_seconds;
+        if (duration) {
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            transcriptionDuration.textContent = `Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } else {
+            transcriptionDuration.textContent = 'Duration: N/A';
+        }
+    }
+    
+    // Update status badge
+    if (transcriptionStatus) {
+        transcriptionStatus.textContent = `Status: ${transcription.status}`;
+        transcriptionStatus.className = `badge badge-status ${transcription.status.toLowerCase()}`;
+    }
+    
+    // Update filename
+    if (transcriptionFilename && transcription.audio_metadata) {
+        transcriptionFilename.textContent = `File: ${transcription.audio_metadata.original_filename}`;
+    }
+    
+    // Update file size
+    if (transcriptionFileSize && transcription.audio_metadata) {
+        const sizeBytes = transcription.audio_metadata.file_size_bytes;
+        const sizeMB = (sizeBytes / (1024 * 1024)).toFixed(2);
+        transcriptionFileSize.textContent = `Size: ${sizeMB} MB`;
+    }
+    
+    // Update audio player
+    if (audioPlayer && transcription.audio_metadata && transcription.audio_metadata.file_path) {
+        audioPlayer.src = transcription.audio_metadata.file_path;
     }
 }
 

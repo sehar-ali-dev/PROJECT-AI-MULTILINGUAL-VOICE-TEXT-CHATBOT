@@ -19,6 +19,20 @@ class TranscriptionCreate(BaseModel):
     status: TranscriptionStatus = TranscriptionStatus.PENDING
 
 
+class AudioMetadata(BaseModel):
+    """Audio file metadata for transcription response."""
+    id: int
+    original_filename: str
+    file_type: str
+    file_size_bytes: int
+    source_type: str
+    file_path: Optional[str] = None
+    duration_seconds: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+
 class TranscriptionResponse(BaseModel):
     id: int
     audio_id: int
@@ -29,6 +43,7 @@ class TranscriptionResponse(BaseModel):
     provider_metadata: Optional[str]
     status: TranscriptionStatus
     created_at: datetime
+    audio_metadata: Optional[AudioMetadata] = None
 
     class Config:
         from_attributes = True

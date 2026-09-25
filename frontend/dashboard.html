@@ -90,16 +90,44 @@
             <div class="step-content" id="step2">
                 <div class="step-card">
                     <h2>STEP 2 — AI TRANSCRIPTION</h2>
+                    
+                    <!-- Error Banner -->
+                    <div id="transcriptionError" class="error-banner" style="display: none;">
+                        <span class="error-icon">⚠️</span>
+                        <span id="errorMessage" class="error-message"></span>
+                    </div>
+                    
+                    <!-- Audio Player -->
+                    <div class="audio-player-section">
+                        <h3>Original Audio</h3>
+                        <audio id="transcriptionAudioPlayer" controls style="width: 100%; margin-top: 10px;">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    
+                    <!-- Transcription Text -->
                     <div class="transcription-panel">
+                        <h3>AI-Generated Transcription</h3>
                         <div id="transcriptionText" class="transcription-text">
                             <p class="placeholder">Transcription will appear here...</p>
                         </div>
+                        
+                        <!-- Metadata Badges -->
                         <div class="transcription-meta">
-                            <span id="transcriptionLanguage" class="meta-label"></span>
-                            <span id="transcriptionConfidence" class="meta-label"></span>
+                            <div class="meta-badges">
+                                <span id="transcriptionLanguage" class="badge badge-language"></span>
+                                <span id="transcriptionConfidence" class="badge badge-confidence"></span>
+                                <span id="transcriptionDuration" class="badge badge-duration"></span>
+                                <span id="transcriptionStatus" class="badge badge-status"></span>
+                            </div>
+                            <div class="meta-details">
+                                <p id="transcriptionFilename" class="meta-detail"></p>
+                                <p id="transcriptionFileSize" class="meta-detail"></p>
+                            </div>
                         </div>
                     </div>
-                    <button id="toStep3" class="btn btn-primary">Proceed to Review</button>
+                    
+                    <button id="toStep3" class="btn btn-primary">Proceed to Human Review (Step 3)</button>
                 </div>
             </div>
 
