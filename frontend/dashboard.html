@@ -135,11 +135,38 @@
             <div class="step-content" id="step3">
                 <div class="step-card">
                     <h2>STEP 3 — HUMAN REVIEW</h2>
+                    
+                    <!-- Success Banner -->
+                    <div id="reviewSuccess" class="success-banner" style="display: none;">
+                        <span class="success-icon">✅</span>
+                        <span class="success-message">Review saved successfully!</span>
+                    </div>
+                    
+                    <!-- Audio Player -->
+                    <div class="audio-player-section">
+                        <h3>Original Audio</h3>
+                        <audio id="reviewAudioPlayer" controls style="width: 100%; margin-top: 10px;">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    
                     <div class="review-section">
+                        <h3>Edit Transcription</h3>
                         <textarea id="reviewText" class="review-textarea" placeholder="Edit the transcription here..."></textarea>
+                        
+                        <!-- Review Notes -->
+                        <div class="review-notes-section">
+                            <label for="reviewNotes">Review Notes / Comments (Optional):</label>
+                            <textarea id="reviewNotes" class="review-notes-textarea" placeholder="Add any notes about your corrections..."></textarea>
+                        </div>
+                        
                         <div class="review-actions">
-                            <button id="resetReview" class="btn btn-secondary">Reset</button>
-                            <button id="toStep4" class="btn btn-primary">Proceed to Translation</button>
+                            <button id="resetReview" class="btn btn-secondary">Reset to Original AI Text</button>
+                            <button id="saveReview" class="btn btn-primary">Save & Submit Review</button>
+                        </div>
+                        
+                        <div class="review-actions" style="margin-top: 15px;">
+                            <button id="toStep4" class="btn btn-primary" disabled>Proceed to Translation</button>
                         </div>
                     </div>
                 </div>
@@ -231,6 +258,7 @@
     <script src="/js/auth.js"></script>
     <script src="/js/recorder.js"></script>
     <script src="/js/transcription.js"></script>
+    <script src="/js/review.js"></script>
     <script>
         // Verify session on page load
         verifySession().then(user => {

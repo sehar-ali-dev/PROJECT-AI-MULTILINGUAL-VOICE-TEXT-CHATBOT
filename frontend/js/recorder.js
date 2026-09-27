@@ -358,6 +358,12 @@ async function triggerTranscription(audioId) {
         localStorage.setItem('current_transcription_text', transcription.ai_transcription);
         localStorage.setItem('detected_language', transcription.source_language);
         
+        // Store audio path for review player (sanitize path)
+        if (transcription.audio_metadata && transcription.audio_metadata.file_path) {
+            const cleanPath = transcription.audio_metadata.file_path.replace(/\\/g, '/');
+            localStorage.setItem('current_audio_path', cleanPath);
+        }
+        
         // Update STEP 2 UI
         updateStep2UI(transcription);
         
@@ -453,8 +459,35 @@ function updateStep2UI(transcription) {
     
     // Update audio player
     if (audioPlayer && transcription.audio_metadata && transcription.audio_metadata.file_path) {
-        audioPlayer.src = transcription.audio_metadata.file_path;
+        loadAudioPlayer(audioPlayer, transcription.audio_metadata.file_path);
     }
+}
+
+// Helper function to load audio player with proper URL handling
+function loadAudioPlayer(audioElement, filePath) {
+    if (!audioElement || !filePath) return;
+    
+    // Sanitize path: replace backslashes with forward slashes
+    const cleanPath = filePath.replace(/\\/g, '/');
+    
+    // Build full URL if path is relative
+    let fullUrl = cleanPath;
+    if (cleanPath.startsWith('/')) {
+        fullUrl = `http://127.0.0.1:8000${cleanPath}`;
+    }
+    
+    audioElement.src = fullUrl;
+    audioElement.load();
+    
+    // Add event listener for loadedmetadata to ensure duration renders
+    audioElement.addEventListener('loadedmetadata', function() {
+        console.log('Audio loaded, duration:', audioElement.duration);
+    }, { once: true });
+    
+    // Handle load errors
+    audioElement.addEventListener('error', function(e) {
+        console.error('Audio load error:', e);
+    }, { once: true });
 }
 
 // Move to specific step

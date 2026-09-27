@@ -555,6 +555,27 @@ body {
     font-size: 14px;
 }
 
+/* Success Banner */
+.success-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background-color: #efe;
+    border: 1px solid #cfc;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.success-icon {
+    font-size: 20px;
+}
+
+.success-message {
+    color: #3c3;
+    font-size: 14px;
+}
+
 /* Audio Player Section */
 .audio-player-section {
     margin-bottom: 20px;
@@ -631,6 +652,36 @@ body {
     font-size: 13px;
     color: #666;
     margin: 0;
+}
+
+/* Review Notes Section */
+.review-notes-section {
+    margin: 20px 0;
+}
+
+.review-notes-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.review-notes-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.review-notes-textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
 }
 
 /* Responsive */

@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -70,6 +71,30 @@ async def transcribe_audio(audio_id: int, user_id: int, source_language: Optiona
                 detail=f"STT processing failed: {str(e)}"
             )
         
+        # Build audio metadata for response
+        audio_metadata = None
+        if transcription.audio_file:
+            # Convert absolute file path to relative URL for frontend
+            file_path = transcription.audio_file.file_path
+            if file_path:
+                # Convert absolute path to relative URL like /uploads/audio/filename.webm
+                # Normalize backslashes to forward slashes for web compatibility
+                path_obj = Path(file_path)
+                relative_path = path_obj.relative_to(Path(__file__).parent.parent.parent.parent)
+                file_url = f"/{relative_path.as_posix().replace('\\', '/')}"
+            else:
+                file_url = None
+            
+            audio_metadata = AudioMetadata(
+                id=transcription.audio_file.id,
+                original_filename=transcription.audio_file.original_filename,
+                file_type=transcription.audio_file.file_type,
+                file_size_bytes=transcription.audio_file.file_size_bytes,
+                source_type=transcription.audio_file.source_type.value,
+                file_path=file_url,
+                duration_seconds=transcription.audio_file.duration_seconds
+            )
+        
         return TranscriptionResponse(
             id=transcription.id,
             audio_id=transcription.audio_id,
@@ -79,7 +104,8 @@ async def transcribe_audio(audio_id: int, user_id: int, source_language: Optiona
             confidence_score=transcription.confidence_score,
             provider_metadata=transcription.provider_metadata,
             status=transcription.status,
-            created_at=transcription.created_at
+            created_at=transcription.created_at,
+            audio_metadata=audio_metadata
         )
         
     except HTTPException:
@@ -115,13 +141,24 @@ def get_transcription(transcription_id: int, user_id: int) -> TranscriptionRespo
         # Build audio metadata
         audio_metadata = None
         if transcription.audio_file:
+            # Convert absolute file path to relative URL for frontend
+            file_path = transcription.audio_file.file_path
+            if file_path:
+                # Convert absolute path to relative URL like /uploads/audio/filename.webm
+                # Normalize backslashes to forward slashes for web compatibility
+                path_obj = Path(file_path)
+                relative_path = path_obj.relative_to(Path(__file__).parent.parent.parent.parent)
+                file_url = f"/{relative_path.as_posix().replace('\\', '/')}"
+            else:
+                file_url = None
+            
             audio_metadata = AudioMetadata(
                 id=transcription.audio_file.id,
                 original_filename=transcription.audio_file.original_filename,
                 file_type=transcription.audio_file.file_type,
                 file_size_bytes=transcription.audio_file.file_size_bytes,
                 source_type=transcription.audio_file.source_type.value,
-                file_path=transcription.audio_file.file_path,
+                file_path=file_url,
                 duration_seconds=transcription.audio_file.duration_seconds
             )
         
